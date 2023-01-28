@@ -15,6 +15,8 @@ Implementation of paper D-Nerf: Neural Randiance Fields for Dynamic Scenes
 | Parameters  |      Values   |
 |----------|:-------------:|
 | Iteration | 200K |
+| Scheduler | Exponential Decay |
+| Scheduler Step | 160K approx. |
 | Rays Sample | 1024 |
 | Crop | 0.5 |
 | Pre Crop Iter | 50 |
