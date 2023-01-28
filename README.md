@@ -34,6 +34,7 @@ Implementation of paper D-Nerf: Neural Randiance Fields for Dynamic Scenes
 | Net Depth | 8 |
 | Inp Feat | 2*(num_channels*pos_enc_dim) + num_channels |
 | Dir Feat | 2*(num_channels*dir_enc_dim) + num_channels |
+| Time Feat| 2*(1*dir_enc_dim) + 1 |
 
 </center>
 
