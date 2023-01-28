@@ -19,7 +19,7 @@ Implementation of paper D-Nerf: Neural Randiance Fields for Dynamic Scenes
 | Crop | 0.5 |
 | Pre Crop Iter | 50 |
 | Factor | 2 |
-| Near Palne | 2.0 |
+| Near Plane | 2.0 |
 | Far Plane | 6.0 |
 | Height | 800 / factor |
 | Width | 800 / factor |
