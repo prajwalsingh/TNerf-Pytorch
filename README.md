@@ -6,6 +6,10 @@ Implementation of paper D-Nerf: Neural Randiance Fields for Dynamic Scenes
 | Nerf (v18)  |      T-Nerf (v2)    |
 |----------|:-------------:|
 | <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/dyn_lego_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/dyn_lego_2.gif"/> |
+| <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/hellwarrior_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/hellwarrior_2.gif"/> |
+| <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/bouncingball_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/bouncingball_2.gif"/> |
+| <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/hook_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/hook_2.gif"/> |
+| <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/jumpingjack_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/jumpingjack_2.gif"/> |
 
 </center>
 
