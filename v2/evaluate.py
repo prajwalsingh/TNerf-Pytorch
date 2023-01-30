@@ -70,7 +70,7 @@ if __name__ == '__main__':
 	#########################################################################################
 	dir_info  = natsorted(glob('EXPERIMENT_*'))
 
-	experiment_num = 1
+	experiment_num = 7
 
 	ckpt_lst = natsorted(glob('EXPERIMENT_{}/checkpoints/nerf_*.pth'.format(experiment_num)))
 

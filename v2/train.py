@@ -9,6 +9,7 @@ import pdb
 import random
 import numpy as np
 import torch
+import visdom
 import config
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -102,7 +103,8 @@ if __name__ == '__main__':
 	# scheduler_fine   = torch.optim.lr_scheduler.ExponentialLR(optimizer_fine, gamma=config.lrsch_gamma, verbose=True)
 	scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=config.lrsch_gamma, verbose=True)
 
-	loss_fn = torch.nn.MSELoss()
+	# vis = visdom.Visdom()
+	# assert vis.check_connection()
 
 	START_EPOCH = 1
 	END_EPOCH   = config.epochs
@@ -143,6 +145,9 @@ if __name__ == '__main__':
 	#########################################################################################
 	nerfnet_coarse.train()
 	# nerfnet_fine.train()
+	mse_plot_tracker  = []
+	psnr_plot_tracker = []
+	epoch_tracker     = []
 
 	for epoch in range(START_EPOCH, END_EPOCH):
 
@@ -346,6 +351,8 @@ if __name__ == '__main__':
 
 			show(imgs=rgb_final, path='EXPERIMENT_{}/train'.format(experiment_num), label='img', idx=epoch)
 			show(imgs=depth_final, path='EXPERIMENT_{}/train'.format(experiment_num), label='depth', idx=epoch)
+			# vis.image(torch.permute(rgb_final, [2, 0, 1]).detach().cpu(), win=1)
+			# vis.image(torch.unsqueeze(depth_final, dim=0).detach().cpu(), win=2)
 			print('Epoch: {}, Test PSNR: {:0.3f}'.format(epoch, sum(test_psnr)/len(test_psnr)))
 			# del rgb_final, depth_final, rgb_coarse, depth_map_coarse, weights_coarse, rgb, density, view_direction_c, view_direction_f, view_direction
 			del rgb_final, depth_final
@@ -363,7 +370,7 @@ if __name__ == '__main__':
 						'scheduler_state_dict': scheduler.state_dict(),
 						# 'scheduler_state_dict_coarse': scheduler_coarse.state_dict(),
 						# 'scheduler_state_dict_fine': scheduler_fine.state_dict()
-				}, 'EXPERIMENT_{}/checkpoints/nerf_{}.pth'.format(experiment_num, epoch))
+				}, 'EXPERIMENT_{}/checkpoints/nerf_{}.pth'.format(experiment_num, 'all'))
 
 		with open('EXPERIMENT_{}/log.txt'.format(experiment_num), 'a') as file:
 			# file.write('Epoch: {}, TL: {:0.3f}, TPSNR: {:0.3f}, VL: {:0.3f}, VPSNR: {:0.3f}\n'.\
@@ -373,7 +380,16 @@ if __name__ == '__main__':
 			file.write('Epoch: {}, TL: {:0.3f}, TPSNR: {:0.3f}, Test PSNR: {:0.3f}\n'.\
 				format(epoch, sum(train_loss_tracker)/len(train_loss_tracker),\
 				sum(train_psnr_tracker)/len(train_psnr_tracker), sum(test_psnr)/len(test_psnr)))
-		
+
+		# mse_plot_tracker.append(sum(train_loss_tracker)/len(train_loss_tracker))
+		# psnr_plot_tracker.append(sum(train_psnr_tracker)/len(train_psnr_tracker))
+		# epoch_tracker.append(epoch)
+
+		# vis.line(X=epoch_tracker, Y=mse_plot_tracker, win=3,
+  #                                 opts={'title': 'Pixel Loss', 'xlabel': 'Epoch', 'ylabel': 'MSE Loss'})
+		# vis.line(X=epoch_tracker, Y=psnr_plot_tracker, win=4,
+  #                                 opts={'title': 'PSNR Loss', 'xlabel': 'Epoch', 'ylabel': 'PSNR'})
+
 		if (epoch%config.lrsch_step)==0:
 			# scheduler_coarse.step()
 			# scheduler_fine.step()

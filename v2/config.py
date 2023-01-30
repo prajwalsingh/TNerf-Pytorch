@@ -3,7 +3,7 @@ import math
 
 os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]= '1'
+os.environ["CUDA_VISIBLE_DEVICES"]= '0'
 
 dataset_type    = 'synthetic' # 'synthetic', 'real', 'llff'
 
@@ -12,10 +12,10 @@ if dataset_type == 'synthetic':
 	# val_camera_path   = 'dataset/nerf_synthetic/lego/transforms_val.json' 
 	# train_image_path  = 'dataset/nerf_synthetic/lego'
 	# val_image_path    = 'dataset/nerf_synthetic/lego'
-	train_camera_path = 'dataset/dsynthetic/lego/transforms_train.json' 
-	val_camera_path   = 'dataset/dsynthetic/lego/transforms_test.json' 
-	train_image_path  = 'dataset/dsynthetic/lego'
-	val_image_path    = 'dataset/dsynthetic/lego'
+	train_camera_path = 'dataset/dsynthetic/mutant/transforms_train.json' 
+	val_camera_path   = 'dataset/dsynthetic/mutant/transforms_test.json' 
+	train_image_path  = 'dataset/dsynthetic/mutant'
+	val_image_path    = 'dataset/dsynthetic/mutant'
 
 	factor       = 2 # factor
 	pre_height   = 800
@@ -25,8 +25,8 @@ if dataset_type == 'synthetic':
 	downscale    = pre_width / image_width
 	near_plane   = 2.0
 	far_plane    = 6.0
-	epochs       = 2001#4001#3501
-	lrsch_step   = 1500#3200#2500
+	epochs       = 1341#4001#3501
+	lrsch_step   = 900#3200#2500
 	pre_epoch    = 50
 	pre_crop     = 0.5
 	noise_value  = 0.0
