@@ -110,6 +110,8 @@ if __name__ == '__main__':
 		os.makedirs('EXPERIMENT_{}/results/camera/depth'.format(experiment_num))
 		os.makedirs('EXPERIMENT_{}/results/time/rgb'.format(experiment_num))
 		os.makedirs('EXPERIMENT_{}/results/time/depth'.format(experiment_num))
+		os.makedirs('EXPERIMENT_{}/results/time+camera/rgb'.format(experiment_num))
+		os.makedirs('EXPERIMENT_{}/results/time+camera/depth'.format(experiment_num))
 
 	if os.path.isfile(ckpt_path):		
 		checkpoint = torch.load(ckpt_path)
@@ -320,5 +322,83 @@ if __name__ == '__main__':
 
 	rgb_video = "EXPERIMENT_{}/results/time/{}_rgb.mp4".format(experiment_num, label)
 	depth_video = "EXPERIMENT_{}/results/time/{}_depth.mp4".format(experiment_num, label)
+	imageio.mimwrite(rgb_video, rgb_frames, fps=30, quality=7, macro_block_size=None)
+	imageio.mimwrite(depth_video, depth_frames, fps=30, quality=7, macro_block_size=None)
+
+	rgb_frames   = []
+	depth_frames = []	
+
+	for i, (time_space, theta) in enumerate(zip(tqdm(np.linspace(0., 1., 120, dtype=np.float32)), np.linspace(0.0, 360.0, 120, endpoint=False))):
+		with torch.no_grad():
+			# Camera to world matrix			
+
+			rgb_final, depth_final = [], []				
+			# image  = torch.permute(base_image, (0, 2, 3, 1))
+			# image  = image.reshape(config.batch_size, -1, 3)
+			base_c2wMatrix = spherical_pose(theta, -30.0, 4.0).to(config.device)
+			base_time      = torch.unsqueeze(torch.as_tensor(time_space).to(config.device), dim=0)
+			dyn_t          = torch.unsqueeze(torch.unsqueeze(nerf_comp.encode_position(base_time, config.dir_enc_dim), dim=0), dim=0)
+
+			for idx  in range(0, config.image_height*config.image_width, config.n_samples):
+				image =  base_direction[idx:idx+config.n_samples]
+				ray_origin, ray_direction = nerf_comp.get_rays(base_c2wMatrix, base_direction[idx:idx+config.n_samples])
+				if config.use_ndc:
+					ray_origin, ray_direction = nerf_comp.ndc_rays(ray_origin, ray_direction, base_near, base_far, base_focal)
+				view_direction    = torch.unsqueeze(ray_direction / torch.linalg.norm(ray_direction, ord=2, dim=-1, keepdim=True), dim=1)
+				view_direction_c  = nerf_comp.encode_position(torch.tile(view_direction, [1, config.num_samples, 1]), config.dir_enc_dim)
+				view_direction_f  = nerf_comp.encode_position(torch.tile(view_direction, [1, config.num_samples_fine + config.num_samples, 1]), config.dir_enc_dim)
+				dyn_t_c           = torch.tile(dyn_t, [image.shape[0], config.num_samples, 1])
+				dyn_t_f           = torch.tile(dyn_t, [image.shape[0], config.num_samples_fine + config.num_samples, 1])
+
+				rays, t_vals     = nerf_comp.sampling_rays(ray_origin=ray_origin, ray_direction=ray_direction, near=base_near, far=base_far, random_sampling=True)
+
+				rgb, density   = nerfnet_coarse(rays, view_direction_c, dyn_t_c)
+
+				rgb_coarse, depth_map_coarse, weights_coarse = nerf_comp.render_rgb_depth(rgb=rgb, density=density, rays_d=ray_direction, t_vals=t_vals, noise_value=config.noise_value, random_sampling=True)
+
+				# rgb_final.append(rgb_coarse)
+				# depth_final.append(depth_map_coarse)
+
+				fine_rays, t_vals_fine = nerf_comp.sampling_fine_rays(ray_origin=ray_origin, ray_direction=ray_direction, t_vals=t_vals, weights=weights_coarse)
+
+				rgb, density   = nerfnet_fine(fine_rays, view_direction_f, dyn_t_f)
+
+				rgb_fine, depth_map_fine, weights_fine = nerf_comp.render_rgb_depth(rgb=rgb, density=density, rays_d=ray_direction, t_vals=t_vals_fine, noise_value=config.noise_value, random_sampling=True)
+
+				rgb_final.append(rgb_fine)
+				depth_final.append(depth_map_fine)
+
+				# del rgb_coarse, depth_map_coarse, weights_coarse, rgb, density, view_direction_c, view_direction_f, rgb_fine, depth_map_fine, weights_fine
+				del rgb_coarse, depth_map_coarse, weights_coarse, rgb, density, view_direction_c, view_direction_f
+
+			rgb_final = torch.concat(rgb_final, dim=0).reshape(config.image_height, config.image_width, -1)
+			# rgb_final = torch.permute(rgb_final, (0, 3, 1, 2))
+			depth_final = torch.concat(depth_final, dim=0).reshape(config.image_height, config.image_width)
+
+			# rgb = torch.permute(rgb, (0, 3, 1, 2))
+			# show(imgs=rgb[:1], path='EXPERIMENT_{}/train'.format(experiment_num), label='img', idx=epoch)
+			# show(imgs=depth_map[:1], path='EXPERIMENT_{}/train'.format(experiment_num), label='depth', idx=epoch)
+			IMG = np.uint8(np.clip(rgb_final.detach().cpu().numpy()*255.0, 0, 255))
+			# DEPTH = np.uint8(np.clip(depth_final.detach().cpu().numpy()*255.0, 0, 255))
+			DEPTH = depth_final.detach().cpu().numpy()
+			DEPTH = (DEPTH - np.min(DEPTH)) / (np.max(DEPTH) - np.min(DEPTH))
+			DEPTH = np.uint8(np.clip(DEPTH*255.0, 0, 255))
+			rgb_frames = rgb_frames + [ IMG ]
+			depth_frames = depth_frames + [ DEPTH ]
+			plt.figure(figsize=(9, 9), dpi=96)
+			plt.imshow(IMG)
+			plt.axis('off')
+			plt.grid(False)
+			plt.savefig('EXPERIMENT_{}/results/time+camera/rgb/{}.png'.format(experiment_num, i))
+			plt.close()
+			plt.figure(figsize=(9, 9), dpi=96)
+			plt.imshow(DEPTH, cmap='gray')
+			plt.axis('off')
+			plt.grid(False)
+			plt.savefig('EXPERIMENT_{}/results/time+camera/depth/{}.png'.format(experiment_num, i))
+			plt.close()
+
+	rgb_video = "EXPERIMENT_{}/results/time+camera/{}_rgb.mp4".format(experiment_num, label)
+	depth_video = "EXPERIMENT_{}/results/time+camera/{}_depth.mp4".format(experiment_num, label)
 	imageio.mimwrite(rgb_video, rgb_frames, fps=30, quality=7, macro_block_size=None)
 	imageio.mimwrite(depth_video, depth_frames, fps=30, quality=7, macro_block_size=None)
