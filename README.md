@@ -12,6 +12,7 @@ Implementation of paper D-Nerf: Neural Randiance Fields for Dynamic Scenes
 | <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/jumpingjack_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/jumpingjack_2.gif"/> |
 | <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/mutant_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/mutant_2.gif"/> |
 | <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/trex_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/trex_2.gif"/> |
+| <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/standup_1.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/standup_2.gif"/> |
 
 </center>
 
