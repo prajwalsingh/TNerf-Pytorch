@@ -101,8 +101,8 @@ if __name__ == '__main__':
 	# 	os.makedirs('EXPERIMENT_{}'.format(experiment_num))
 
 	# os.system('cp *.py EXPERIMENT_{}'.format(experiment_num))
-	label = 'lego'
-	experiment_num = 1
+	label = 'ballon-1'
+	experiment_num = 9
 	ckpt_path  = natsorted(glob('EXPERIMENT_{}/checkpoints/nerf_*.pth'.format(experiment_num)))[-1]
 
 	if not os.path.isdir('EXPERIMENT_{}/results/'.format(experiment_num)):
@@ -328,14 +328,14 @@ if __name__ == '__main__':
 	rgb_frames   = []
 	depth_frames = []	
 
-	for i, (time_space, theta) in enumerate(zip(tqdm(np.linspace(0., 1., 120, dtype=np.float32)), np.linspace(0.0, 360.0, 120, endpoint=False))):
+	for i, (time_space, base_c2wMatrix) in enumerate(zip(tqdm(np.linspace(0., 1., 120, dtype=np.float32)), render_poses)):
 		with torch.no_grad():
 			# Camera to world matrix			
 
 			rgb_final, depth_final = [], []				
 			# image  = torch.permute(base_image, (0, 2, 3, 1))
 			# image  = image.reshape(config.batch_size, -1, 3)
-			base_c2wMatrix = spherical_pose(theta, -30.0, 4.0).to(config.device)
+			base_c2wMatrix = torch.as_tensor(base_c2wMatrix[:, :-1], dtype=torch.float32).to(config.device)
 			base_time      = torch.unsqueeze(torch.as_tensor(time_space).to(config.device), dim=0)
 			dyn_t          = torch.unsqueeze(torch.unsqueeze(nerf_comp.encode_position(base_time, config.dir_enc_dim), dim=0), dim=0)
 
