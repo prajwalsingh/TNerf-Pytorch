@@ -16,6 +16,16 @@ Implementation of paper D-Nerf: Neural Randiance Fields for Dynamic Scenes
 
 </center>
 
+## Novel Views
+<center>
+
+| Camera  |  Time  | Camera + Time |
+|----------|-------------|:-------------:|
+| <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/lego_camera.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/lego_time.gif"/> |  <img src="https://github.com/prajwalsingh/DNerf-Pytorch/blob/main/results/lego_time+camera.gif"/> | 
+
+</center>
+
+
 ## Hyperparameters:
 <center>
 
